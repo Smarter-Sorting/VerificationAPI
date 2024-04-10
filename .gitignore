@@ -6,3 +6,5 @@
 /.idea
 # python
 /__pycache__
+# environment variables
+.env
