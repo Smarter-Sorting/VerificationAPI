@@ -1,0 +1,89 @@
+openapi: 3.0.0
+info:
+  title: Sample Verification API
+  version: "1.0.0"
+  description: API to verify data and write to Snowflake database.
+servers:
+  - url: http://localhost:5000/
+paths:
+  /:
+    get:
+      summary: Status Check
+      responses:
+        '200':
+          description: Returns a simple hello world message.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Hello World!
+
+  /verification:
+    post:
+      summary: Verify and process input data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: object
+                  properties:
+                    product_name:
+                      type: string
+                    brand_name:
+                      type: string
+                    ingredients:
+                      type: string
+                    intended_use:
+                      type: string
+                job_id:
+                  type: string
+                modified_classifications:
+                  type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/Classification'
+      responses:
+        '200':
+          description: Data processed and received successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: data received
+        '400':
+          description: Invalid request body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Request body is invalid
+
+components:
+  schemas:
+    Classification:
+      type: object
+      properties:
+        result_id:
+          type: string
+        status:
+          type: string
+        result:
+          type: string
+        reason:
+          type: string
+        result_explanation:
+          type: string
+        modified_result:
+          type: string
