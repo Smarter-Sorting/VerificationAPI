@@ -22,12 +22,15 @@ def verify():
     rows = []
     if request.is_json:
         data = request.json
-        input_data = data["input"]
-        input_data["job_id"] = data["job_id"]
-        for modified_classification in data['modified_classifications']:
-            classification_data = data["modified_classifications"][modified_classification]
-            classification_data["modified_classification"] = modified_classification
-            rows.append(dict(input_data, **classification_data))
+        try:
+            input_data = data["input"]
+            input_data["job_id"] = data["job_id"]
+            for modified_classification in data['modified_classifications']:
+                classification_data = data["modified_classifications"][modified_classification]
+                classification_data["modified_classification"] = modified_classification
+                rows.append(dict(input_data, **classification_data))
+        except:
+            return jsonify({"error": "JSON body not correctly formatted"}), 400
         df = pd.DataFrame.from_dict(rows)
         df.columns = map(str.upper, df.columns)
         cnx = snowflake.connector.connect(
@@ -42,4 +45,4 @@ def verify():
         success, nchunks, nrows, _ = write_pandas(cnx, df, "VERIFICATION_RESULTS")
         return jsonify({"message": "data received"}), 200
     else:
-        return jsonify({"error": "Request body is invalid"}), 400
+        return jsonify({"error": "Request body is not in JSON format"}), 400
